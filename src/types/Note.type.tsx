@@ -1,3 +1,10 @@
+export type CreateNote = {
+  onCreateNote: (note: Note, tags: Tag[]) => {
+    notes: Note[];
+    tags: Tag[];
+}
+}
+
 export type NoteFormProps = {
   onSubmit: (data: Note) => void;
 };

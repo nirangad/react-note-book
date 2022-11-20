@@ -1,8 +1,12 @@
 import React from "react";
-import { Note } from "../types/Note.type";
+import { Note, CreateNoteCallback } from "../types/Note.type";
 import NoteForm from "./NoteForm";
 
-export default function NewNote() {
+export default function NewNote({
+  onCreateNote,
+}: {
+  onCreateNote: CreateNoteCallback;
+}) {
   const onSubmit = (data: Note) => {
     console.log(data);
   };
