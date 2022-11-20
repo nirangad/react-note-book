@@ -1,13 +1,32 @@
 import { FormEvent, useRef, useState } from "react";
-import { Button, Col, Form, Row, Stack, Tab } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import {
+  Button,
+  Col,
+  Form,
+  Row,
+  Stack,
+  Tab,
+  TabContainer,
+} from "react-bootstrap";
 import CreatableReactSelect from "react-select/creatable";
+import { Link } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+
+import useLocalStorage, {
+  StorageKey,
+  StorageKeys,
+} from "../hooks/useLocalStorage";
 import { NoteFormProps, Tag } from "../types/Note.type";
 
 export default function NoteForm({ onSubmit }: NoteFormProps) {
   const titleRef = useRef<HTMLInputElement>(null);
   const markdownRef = useRef<HTMLTextAreaElement>(null);
   const [selectedTags, setSelectedtags] = useState<Tag[]>([]);
+
+  const [globalTags, setGlobalTags] = useLocalStorage<Tag[]>(
+    StorageKeys.TAGS as StorageKey,
+    []
+  );
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,6 +36,7 @@ export default function NoteForm({ onSubmit }: NoteFormProps) {
       tags: selectedTags,
     });
     e.currentTarget.reset();
+    setSelectedtags([]);
   };
 
   return (
@@ -33,22 +53,54 @@ export default function NoteForm({ onSubmit }: NoteFormProps) {
 
           {/* Tags */}
           <Col>
-            <Form.Group controlId="tags">
+            <Form.Group controlId="tagList">
               <Form.Label>Tags</Form.Label>
               <CreatableReactSelect
                 isMulti
-                options={selectedTags.map((tag: Tag) => {
+                value={selectedTags.map((tag: Tag) => {
                   return {
                     label: tag.label,
                     value: tag.id,
                   };
                 })}
-                onChange={(tags) => {
-                  let sTags = tags.map((tag) => {
-                    return { label: tag.label, id: tag.value };
-                  });
-                  console.log("On change: ", sTags);
-                  setSelectedtags(sTags);
+                options={globalTags.map((tag: Tag) => {
+                  return {
+                    label: tag.label,
+                    value: tag.id,
+                  };
+                })}
+                onChange={(tags: any) => {
+                  let newTags: Tag[] = [];
+                  let selTags: Tag[] = [];
+
+                  tags.forEach(
+                    (tag: {
+                      label: string;
+                      value: string | undefined;
+                      __isNew__: boolean;
+                    }) => {
+                      let newTag: Tag = { label: tag.label, id: tag.value };
+                      if (tag.__isNew__) {
+                        let duplicate =
+                          globalTags.filter((t) => tag.label == t.label)
+                            .length > 0;
+
+                        if (!duplicate) {
+                          newTag.id = uuidv4();
+                          newTags.push(newTag);
+                        }
+                      }
+                      selTags.push(newTag);
+                    }
+                  );
+
+                  if (newTags.length > 0) {
+                    setGlobalTags((prevTags) => {
+                      return [...prevTags, ...newTags];
+                    });
+                  }
+
+                  setSelectedtags(selTags);
                 }}
               />
             </Form.Group>
