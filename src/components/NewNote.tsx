@@ -1,15 +1,13 @@
-import React from "react";
 import { Note } from "../types/Note.type";
 import NoteForm from "./NoteForm";
 
 export default function NewNote({
   onCreateNote,
 }: {
-  onCreateNote: (note: Note) => Note[];
+  onCreateNote: (note: Note) => void;
 }) {
   const onSubmit = (data: Note) => {
-    console.log('Data: ', data);
-    console.log('Notes: ', onCreateNote(data));
+    onCreateNote(data);
   };
 
   return (
