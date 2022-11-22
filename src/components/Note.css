@@ -1,3 +1,23 @@
 .note {
+  margin-top: 15px;
   display: flex;
+  flex-direction: column;
+}
+
+.header {
+  font-size: large;
+  font-weight: bold;
+}
+
+.tags {
+  display: flex;
+}
+
+.tag {
+  margin: 2px;
+  font-size: 12px;
+  padding: 0 10px;
+  border: 1px solid #90bede;
+  border-radius: 3px;
+  background-color: #dffdff;
 }
